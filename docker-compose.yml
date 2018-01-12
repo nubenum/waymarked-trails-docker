@@ -1,7 +1,7 @@
 version: '3.2'
 services:
     waymarkedtrails:
-        image: waymarkedtrails/waymarkedtrails:latest
+        image: waymarkedtrails-built
         volumes:
             # create with e.g. openssl req -newkey rsa:2048 -x509 -keyout key.pem -out server.pem -subj "/C=/ST=/L=/O=/OU=/CN=localhost/" -days 3650 -nodes
           - type: bind
@@ -29,6 +29,9 @@ services:
             - NODH=yes
             - DATAFILE=data.osm.pbf
             - DBNAME=planet
+        #For testing with docker exec without starting the server
+        #entrypoint: /bin/bash
+        #tty: true
     db:
         image: mdillon/postgis:9.6-alpine
         volumes:
@@ -37,6 +40,14 @@ services:
             target: /var/lib/postresql/data
         ports:
             - "5432:5432"
+    phppgadmin:
+        image: zhajor/docker-phppgadmin
+        container_name: phppgadmin
+        environment:
+            - DB_HOST=db
+            - DB_PORT=5432
+        ports:
+            - "8081:80"
 volumes:
     waymarkedtrails_data:
         driver: local
